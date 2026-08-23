@@ -105,6 +105,8 @@ class RecoveryOutcome(Base):
     execution_time_ms: Mapped[int | None] = mapped_column(Integer)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
+    action: Mapped["RecoveryAction"] = relationship(back_populates="outcome")
+
 
 class ModelPrediction(Base):
     __tablename__ = "model_predictions"
