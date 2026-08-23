@@ -1,0 +1,81 @@
+{
+  "models": {
+    "DO_NOTHING": {
+      "type": "constant",
+      "constant": 0.016187208586258467,
+      "roc_auc": null,
+      "note": "insufficient variance"
+    },
+    "RETRY_NOW": {
+      "type": "hist_gradient_boosting",
+      "roc_auc": 0.7918,
+      "precision": 0.6,
+      "recall": 0.3806,
+      "f1": 0.4658,
+      "brier_calibration": 0.1572,
+      "test_rows": 1706
+    },
+    "RETRY_LATER": {
+      "type": "hist_gradient_boosting",
+      "roc_auc": 0.7436,
+      "precision": 0.5309,
+      "recall": 0.3462,
+      "f1": 0.4191,
+      "brier_calibration": 0.1816,
+      "test_rows": 1706
+    },
+    "CREATE_PAYMENT_LINK": {
+      "type": "hist_gradient_boosting",
+      "roc_auc": 0.7547,
+      "precision": 0.6232,
+      "recall": 0.7355,
+      "f1": 0.6747,
+      "brier_calibration": 0.1954,
+      "test_rows": 1706
+    },
+    "ALTERNATE_PAYMENT_METHOD": {
+      "type": "hist_gradient_boosting",
+      "roc_auc": 0.7799,
+      "precision": 0.6313,
+      "recall": 0.6029,
+      "f1": 0.6168,
+      "brier_calibration": 0.1829,
+      "test_rows": 1706
+    },
+    "SEND_REMINDER": {
+      "type": "hist_gradient_boosting",
+      "roc_auc": 0.685,
+      "precision": 0.5,
+      "recall": 0.0183,
+      "f1": 0.0352,
+      "brier_calibration": 0.1751,
+      "test_rows": 1706
+    }
+  },
+  "feature_names": [
+    "amount_log",
+    "attempt_number",
+    "customer_previous_payments",
+    "customer_success_rate",
+    "customer_days_since_last_payment",
+    "hour",
+    "day_of_week",
+    "merchant_success_rate",
+    "recent_method_failure_rate",
+    "is_repeat_customer",
+    "amount_percentile",
+    "method_CARD",
+    "method_NETBANKING",
+    "method_UPI",
+    "method_WALLET",
+    "reason_AUTHENTICATION_FAILURE",
+    "reason_CUSTOMER_ABANDONMENT",
+    "reason_INSUFFICIENT_FUNDS",
+    "reason_MERCHANT_CONFIGURATION",
+    "reason_NETWORK_FAILURE",
+    "reason_PAYMENT_METHOD_ISSUE",
+    "reason_REPEATED_FAILURE",
+    "reason_TEMPORARY_BANK_FAILURE"
+  ],
+  "model_version": "1.0.0"
+}
