@@ -7,25 +7,13 @@ learn approximations of this process from data only.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 
 from app.models.enums import FailureReason, PaymentMethod, RecoveryActionType, Timing
-
-
-@dataclass(frozen=True)
-class RecoveryContext:
-    customer_success_rate: float
-    customer_total_payments: int
-    amount: float
-    amount_percentile: float  # 0..1 within merchant distribution
-    payment_method: str
-    failure_reason: str
-    attempt_number: int
-    merchant_success_rate: float
-    recent_method_failure_rate: float
-    hour: int
-    day_of_week: int
-    days_since_last_payment: float
+from app.services.recovery_context import RecoveryContext
 
 
 # Base recovery probability per action, conditioned on root cause.

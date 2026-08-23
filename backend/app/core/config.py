@@ -1,11 +1,14 @@
 """Application configuration loaded from environment variables."""
 from functools import lru_cache
+from pathlib import Path
 
 from dotenv import load_dotenv
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 class Settings(BaseSettings):
@@ -34,7 +37,7 @@ class Settings(BaseSettings):
     RANDOM_SEED: int = Field(default=42)
     SYNTHETIC_TXN_COUNT: int = Field(default=50_000)
 
-    MODEL_DIR: str = "ml/models"
+    MODEL_DIR: str = str(REPO_ROOT / "ml" / "models")
 
 
 @lru_cache

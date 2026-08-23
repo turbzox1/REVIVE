@@ -42,8 +42,8 @@ class MerchantPolicy(Base):
     allow_payment_links: Mapped[bool] = mapped_column(Boolean, default=True)
     allow_automatic_retry: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    friction_cost_per_notification: Mapped[float] = mapped_column(default=10.0)
-    friction_cost_per_retry: Mapped[float] = mapped_column(default=15.0)
+    friction_cost_per_notification: Mapped[float] = mapped_column(default=35.0)
+    friction_cost_per_retry: Mapped[float] = mapped_column(default=45.0)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
