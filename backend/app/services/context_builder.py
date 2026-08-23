@@ -34,17 +34,20 @@ def build_feature_row(db: Session, payment: PaymentORM) -> dict:
     )
 
     week_ago = payment.created_at.timestamp() - 7 * 86400
+    window_start = payment.created_at - func.make_interval(0, 0, 0, 7)
     method_total = db.scalar(
         select(func.count(PaymentORM.id)).where(
             PaymentORM.payment_method == payment.payment_method,
-            PaymentORM.created_at >= payment.created_at - func.make_interval(0, 0, 0, 7),
+            PaymentORM.created_at >= window_start,
+            PaymentORM.created_at < payment.created_at,
         )
     ) or 0
     method_failed = db.scalar(
         select(func.count(PaymentORM.id)).where(
             PaymentORM.payment_method == payment.payment_method,
             PaymentORM.status == "FAILED",
-            PaymentORM.created_at >= payment.created_at - func.make_interval(0, 0, 0, 7),
+            PaymentORM.created_at >= window_start,
+            PaymentORM.created_at < payment.created_at,
         )
     ) or 0
     recent_method_failure_rate = (method_failed / method_total) if method_total else 0.08
