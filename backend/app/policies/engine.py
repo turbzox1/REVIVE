@@ -65,7 +65,7 @@ def evaluate_policy(
     now = datetime.now(timezone.utc)
 
     retries_used = payment.attempt_number - 1 + sum(
-        1 for a in prior_recovery_actions if a.action_type in {v.value for v in RETRY_ACTIONS}
+        1 for a in prior_recovery_actions if a.action_type in RETRY_ACTIONS
     )
     notifications_sent = sum(
         1 for a in prior_recovery_actions if a.action_type in NOTIFICATION_ACTIONS
