@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-08-23T12:27:06.265886+00:00",
+  "transactions_evaluated": 2000,
+  "strategies": [
+    {
+      "strategy": "DO_NOTHING",
+      "revenue_at_risk": 6803940.61,
+      "revenue_recovered": 140685.09,
+      "recovery_rate": 0.0207,
+      "interventions": 0,
+      "unnecessary_interventions": 0,
+      "average_recovery_value": 0.0,
+      "incremental_revenue": null
+    },
+    {
+      "strategy": "ALWAYS_RETRY",
+      "revenue_at_risk": 6803940.61,
+      "revenue_recovered": 2407554.9,
+      "recovery_rate": 0.3538,
+      "interventions": 3526,
+      "unnecessary_interventions": 0,
+      "average_recovery_value": 682.8,
+      "incremental_revenue": 2266869.81
+    },
+    {
+      "strategy": "REVIVE",
+      "revenue_at_risk": 6803940.61,
+      "revenue_recovered": 2463978.08,
+      "recovery_rate": 0.3621,
+      "interventions": 1784,
+      "unnecessary_interventions": 0,
+      "average_recovery_value": 1381.15,
+      "incremental_revenue": 2323292.99
+    }
+  ],
+  "revive_action_distribution": {
+    "CREATE_PAYMENT_LINK": 1057,
+    "DO_NOTHING": 216,
+    "ALTERNATE_PAYMENT_METHOD": 392,
+    "RETRY_LATER": 98,
+    "SEND_REMINDER": 140,
+    "RETRY_NOW": 97
+  }
+}
