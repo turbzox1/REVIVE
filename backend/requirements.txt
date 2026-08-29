@@ -8,7 +8,9 @@ psycopg[binary]>=3.2,<4.0
 python-dotenv>=1.0,<2.0
 
 # ML
-scikit-learn>=1.5,<2.0
+# scikit-learn pinned to the exact version the recovery models were trained with
+# (joblib pickles are not guaranteed loadable across sklearn minor versions).
+scikit-learn==1.8.0
 pandas>=2.2
 numpy>=1.26
 joblib>=1.4

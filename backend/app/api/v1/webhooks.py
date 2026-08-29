@@ -5,6 +5,7 @@ import logging
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, Header, Request
+from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -12,8 +13,15 @@ from app.core.config import settings
 from app.db.session import get_db
 from app.integrations.razorpay import verify_webhook_signature
 from app.models.catalog import Payment as PaymentORM
-from app.models.enums import PaymentStatus
+from app.models.catalog import PaymentAttempt
+from app.models.enums import (
+    AttemptStatus,
+    OpportunityStatus,
+    OutcomeResult,
+    PaymentStatus,
+)
 from app.models.ops import WebhookEvent
+from app.models.recovery import RecoveryAction, RecoveryOpportunity, RecoveryOutcome
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -25,12 +33,20 @@ RECOVERABLE_EVENTS = {"payment.captured", "payment.authorized", "order.paid"}
 async def razorpay_webhook(
     request: Request,
     x_razorpay_signature: str | None = Header(default=None),
+    x_razorpay_event_id: str | None = Header(default=None),
     db: Session = Depends(get_db),
 ) -> dict:
     body = await request.body()
     payload = await request.json()
 
-    event_id = payload.get("id") or f"unsigned_{payload.get('event', 'unknown')}_{id(payload)}"
+    # Real Razorpay deliveries carry the event id in X-Razorpay-Event-Id;
+    # fall back to a stable digest of the raw body for unsigned/local tests.
+    event_id = (
+        x_razorpay_event_id
+        or payload.get("id")
+        or f"unsigned_{payload.get('event', 'unknown')}_"
+        + __import__("hashlib").sha256(body).hexdigest()[:24]
+    )
     event_type = payload.get("event", "unknown")
 
     # Idempotency check first: duplicate delivery is a no-op.
@@ -88,6 +104,7 @@ def _process_event(db: Session, event_type: str, payload: dict) -> str | None:
         if event_type in RECOVERABLE_EVENTS:
             payment.status = PaymentStatus.CAPTURED.value if event_type != "payment.authorized" \
                 else PaymentStatus.AUTHORIZED.value
+            _finalize_pending_recovery(db, payment)
         elif event_type == "payment.failed":
             payment.status = PaymentStatus.FAILED.value
         db.commit()
@@ -95,3 +112,38 @@ def _process_event(db: Session, event_type: str, payload: dict) -> str | None:
     except Exception as exc:  # keep webhook ingest resilient
         db.rollback()
         return str(exc)
+
+
+def _finalize_pending_recovery(db: Session, payment: PaymentORM) -> None:
+    """On a real captured/paid webhook, settle the pending recovery execution."""
+    now = datetime.now(timezone.utc)
+    opp = db.query(RecoveryOpportunity).filter_by(payment_id=payment.id).first()
+    if opp is not None:
+        action = (
+            db.query(RecoveryAction)
+            .filter_by(recovery_opportunity_id=opp.id, selected=True)
+            .first()
+        )
+        if action is not None:
+            outcome = (
+                db.query(RecoveryOutcome)
+                .filter_by(recovery_action_id=action.id)
+                .first()
+            )
+            if outcome is not None and outcome.outcome == OutcomeResult.PENDING.value:
+                outcome.outcome = OutcomeResult.RECOVERED.value
+                outcome.successful = True
+                outcome.recovered_amount = payment.amount
+                outcome.completed_at = now
+        if opp.status == OpportunityStatus.EXECUTING.value:
+            opp.status = OpportunityStatus.RECOVERED.value
+
+    attempt = (
+        db.query(PaymentAttempt)
+        .filter_by(payment_id=payment.id, status=AttemptStatus.PENDING.value)
+        .order_by(desc(PaymentAttempt.id))
+        .first()
+    )
+    if attempt is not None:
+        attempt.status = AttemptStatus.SUCCESS.value
+        attempt.completed_at = now

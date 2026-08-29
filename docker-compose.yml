@@ -22,12 +22,17 @@ services:
 
   backend:
     build: .
+    env_file:
+      - .env
     environment:
       APP_ENV: development
       DATABASE_URL: postgresql+psycopg://revive:revive@postgres:5432/revive
       REDIS_URL: redis://redis:6379/0
+      MODEL_DIR: /app/ml/models
     ports:
       - "8000:8000"
+    volumes:
+      - ./data:/app/data
     depends_on:
       postgres:
         condition: service_healthy

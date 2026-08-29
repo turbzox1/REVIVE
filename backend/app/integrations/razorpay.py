@@ -49,7 +49,7 @@ def create_payment_link(db: Session, opportunity_id: int) -> dict:
             "description": f"REVIVE recovery for payment {payment.external_payment_id}",
             "customer": {
                 "name": customer.external_customer_id,
-                "contact": "+919999999999",
+                "contact": "+919123456789",
                 "email": f"{customer.external_customer_id}@revive.test",
             },
             "notes": {
