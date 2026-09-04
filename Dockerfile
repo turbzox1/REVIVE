@@ -9,6 +9,7 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/app ./app
+COPY backend/seed_e2e.py ./seed_e2e.py
 COPY ml ./ml
 COPY simulator ./simulator
 COPY scripts ./scripts
