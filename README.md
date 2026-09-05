@@ -43,28 +43,16 @@ REVIVE is a modular Python backend (FastAPI) that connects to a PostgreSQL datab
 
 ```mermaid
 flowchart TD
-    subgraph "Frontend / User"
-        F[Web / Mobile Frontend]
-    end
-
-    subgraph "Backend (FastAPI)"
-        A[API Router] -->|POST /recovery/decide| S[Decision Engine]
-        A -->|GET /recovery/opportunities| O[Opportunity Service]
-        A -->|POST /recovery/{id}/execute| E[Execution Service]
-    end
-
-    subgraph "Services"
-        S -->|build_feature_row| C[Context Builder]
-        S -->|predict| P[ML Predictor]
-        S -->|evaluate_policy| POL[Policy Engine]
-        E -->|resolve_execution_channel| R[Integration (Razorpay)]
-    end
-
-    subgraph "Persistence"
-        PG[(PostgreSQL – revive DB)]
-        RD[(Redis – cache)]
-    end
-
+    F[Frontend] --> A[API Router]
+    A --> S[Decision Engine]
+    A --> O[Opportunity Service]
+    A --> E[Execution Service]
+    S --> C[Context Builder]
+    S --> P[ML Predictor]
+    S --> POL[Policy Engine]
+    E --> R[Razorpay Integration]
+    PG[(PostgreSQL)] -->|stores| A
+    RD[(Redis)] -->|caches| S
     style PG fill:#f9f9f9,stroke:#333,stroke-width:2px
     style RD fill:#f9f9f9,stroke:#333,stroke-width:2px
     style S fill:#e3f2fd,stroke:#333,stroke-width:2px
